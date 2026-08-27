@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+title: "Soil Microbial Ecology: Tillage vs Cover Crop"
+message: "If you use this workflow, please cite this repository."
+type: software
+authors:
+  - family-names: Cortes
+    given-names: Larisa
+repository-code: "https://github.com/Larisa19/microbial_ecology"
+abstract: "Reproducible Nextflow workflow for 16S rRNA amplicon sequencing analysis of vineyard soil microbial communities, comparing tillage and cover crop management."
+license: MIT
