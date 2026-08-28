@@ -48,3 +48,7 @@ results/dada2/
 # Raw and trimmed QC outputs
 results/qc/raw/
 results/qc/trimmed/
+
+# Nextflow execution reports
+results/timeline.html
+results/execution_report.html
