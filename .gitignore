@@ -36,3 +36,8 @@ test_metadata.nf
 workflow.txt
 command_history.txt
 accessions.txt
+
+!results/
+!results/qc/
+!results/qc/multiqc/
+!results/qc/multiqc/multiqc_report.html
