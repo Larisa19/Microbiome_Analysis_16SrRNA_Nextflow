@@ -49,7 +49,7 @@ The current Nextflow workflow includes:
 FastQC                    |
    |                      |
    v                      |
-Cutadapt                   |
+Cutadapt                  |
    |                      |
    v                      |
 FastQC after trimming     |
@@ -100,6 +100,7 @@ Current outputs include:
 * Denoising
 * Paired-end read merging
 * ASV abundance table
+* MultiQC quality control report: [`multiqc_report.html`](results/qc/multiqc/multiqc_report.html)
 
 Downstream microbial community analysis is currently in progress.
 
