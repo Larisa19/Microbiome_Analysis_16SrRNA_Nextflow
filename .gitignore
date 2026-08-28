@@ -41,3 +41,10 @@ accessions.txt
 !results/qc/
 !results/qc/multiqc/
 !results/qc/multiqc/multiqc_report.html
+
+# DADA2 intermediate results
+results/dada2/
+
+# Raw and trimmed QC outputs
+results/qc/raw/
+results/qc/trimmed/
