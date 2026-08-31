@@ -113,6 +113,20 @@ Planned analyses include:
 * Community composition
 * Comparison of tillage vs cover crop treatments
 
+## Requirements
+
+The workflow requires:
+
+- Nextflow
+- Java
+- SRA Toolkit
+- FastQC
+- Cutadapt
+- MultiQC
+- R with the DADA2 package
+
+The workflow is designed to run locally and can be adapted to HPC environments.
+
 ## Reproducibility
 
 The workflow is implemented using **Nextflow DSL2** and is designed to
