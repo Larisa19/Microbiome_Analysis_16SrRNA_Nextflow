@@ -119,7 +119,6 @@ The workflow requires:
 
 - Nextflow
 - Java
-- SRA Toolkit
 - FastQC
 - Cutadapt
 - MultiQC
