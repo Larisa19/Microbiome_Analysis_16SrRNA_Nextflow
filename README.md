@@ -113,6 +113,11 @@ Planned analyses include:
 * Community composition
 * Comparison of tillage vs cover crop treatments
 
+## Quality Control
+
+An interactive MultiQC report is available via GitHub Pages:
+
+[View the MultiQC report](https://larisa19.github.io/microbial_ecology/multiqc/)
 ## Requirements
 
 The workflow requires:
