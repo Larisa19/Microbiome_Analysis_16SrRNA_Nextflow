@@ -107,6 +107,11 @@ saveRDS(errR, "error_model_R.rds")
 
 EOF
 """
+    stub:
+    """
+    touch error_model_F.rds
+    touch error_model_R.rds
+    """
 }
 process DADA2_DENOISE {
 
@@ -135,9 +140,9 @@ process DADA2_DENOISE {
           val(cultivar),
           val(stage),
           path("${sample_id}_F_dada.rds"),
-path("${sample_id}_R_dada.rds"),
-path("${sample_id}_F_derep.rds"),
-path("${sample_id}_R_derep.rds"),
+	  path("${sample_id}_R_dada.rds"),
+	  path("${sample_id}_F_derep.rds"),
+	  path("${sample_id}_R_derep.rds"),
 emit: denoised
 
     script:
@@ -175,6 +180,13 @@ emit: denoised
 EOF
 
     """
+   stub:
+   """
+   touch ${sample_id}_F_dada.rds
+   touch ${sample_id}_R_dada.rds
+   touch ${sample_id}_F_derep.rds
+   touch ${sample_id}_R_derep.rds
+   """
 }
 process DADA2_MERGE {
 
@@ -233,6 +245,10 @@ mergers <- mergePairs(
 EOF
 
     """
+    stub:
+    """
+    touch ${sample_id}_merged.rds
+    """
 }
 
 process DADA2_TABLE {
@@ -248,7 +264,7 @@ process DADA2_TABLE {
     output:
 
     path "asv_table.rds", emit: asv_table
-    path "asv_table.tsv"
+    path "asv_table.tsv", emit: asv_table_tsv
 
     script:
 
@@ -306,5 +322,10 @@ process DADA2_TABLE {
 
     EOF
 
+    """
+    stub:
+    """
+    touch asv_table.rds
+    touch asv_table.tsv
     """
 }

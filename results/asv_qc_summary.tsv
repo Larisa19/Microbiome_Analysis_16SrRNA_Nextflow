@@ -1,0 +1,9 @@
+sample	treatment	irrigation	cultivar	stage	total_reads	observed_ASVs
+ERR4702530	cover_crop	no_irrigation	Xynisteri	harvest	92313	2724
+ERR4702531	cover_crop	no_irrigation	Xynisteri	harvest	183645	3842
+ERR4702532	cover_crop	no_irrigation	Xynisteri	harvest	59841	1814
+ERR4702533	cover_crop	no_irrigation	Xynisteri	harvest	71919	1965
+ERR4702538	tillage	no_irrigation	Xynisteri	harvest	46485	1711
+ERR4702539	tillage	no_irrigation	Xynisteri	harvest	44890	1668
+ERR4702540	tillage	no_irrigation	Xynisteri	harvest	51983	1843
+ERR4702541	tillage	no_irrigation	Xynisteri	harvest	74323	2532

@@ -1,0 +1,14 @@
+ASV TABLE VALIDATION
+====================
+
+Samples in metadata: 8
+Samples in ASV table: 8
+Matching samples: 8
+Total ASVs: 8953
+Invalid rows: 0
+
+Missing from ASV table:
+None
+
+Missing from metadata:
+None

@@ -1,6 +1,7 @@
 nextflow.enable.dsl=2
 
 include { DADA2_FILTER; DADA2_LEARN_ERRORS; DADA2_DENOISE; DADA2_MERGE; DADA2_TABLE } from './modules/dada2/main_dada2.nf'
+include { ASV_QC } from './modules/asv_qc/main_asv_qc.nf'
 
 process FASTQC_RAW {
 tag "$sample_id"
@@ -150,6 +151,11 @@ merged_files = DADA2_MERGE.out.merged
     .collect()
 
 DADA2_TABLE(merged_files)
+
+ASV_QC(
+    DADA2_TABLE.out.asv_table_tsv,
+    Channel.value(file('assets/samplesheet.csv'))
+)
 
 all_fastqc = FASTQC_RAW.out.fastqc_raw
     .mix(FASTQC_TRIMMED.out.fastqc_trimmed)
