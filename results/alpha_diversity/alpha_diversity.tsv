@@ -1,9 +1,9 @@
 sample	err	treatment	irrigation	cultivar	stage	observed_ASVs	Shannon
-ERR4702530	ERR4702530	cover_crop	no_irrigation	Xynisteri	harvest	2713	7.12883142613413
-ERR4702531	ERR4702531	cover_crop	no_irrigation	Xynisteri	harvest	3813	7.34807264287223
-ERR4702532	ERR4702532	cover_crop	no_irrigation	Xynisteri	harvest	1803	6.85564789620317
-ERR4702533	ERR4702533	cover_crop	no_irrigation	Xynisteri	harvest	1965	7.06147463165325
-ERR4702538	ERR4702538	tillage	no_irrigation	Xynisteri	harvest	1709	6.87861016979122
-ERR4702539	ERR4702539	tillage	no_irrigation	Xynisteri	harvest	1662	6.86207696925859
-ERR4702540	ERR4702540	tillage	no_irrigation	Xynisteri	harvest	1833	6.86396994910838
-ERR4702541	ERR4702541	tillage	no_irrigation	Xynisteri	harvest	2523	7.15116568718039
+ERR4702530	ERR4702530	cover_crop	no_irrigation	Xynisteri	harvest	2707	7.12629731254665
+ERR4702531	ERR4702531	cover_crop	no_irrigation	Xynisteri	harvest	3798	7.34306559981931
+ERR4702532	ERR4702532	cover_crop	no_irrigation	Xynisteri	harvest	1800	6.85417108186927
+ERR4702533	ERR4702533	cover_crop	no_irrigation	Xynisteri	harvest	1963	7.06166748077035
+ERR4702538	ERR4702538	tillage	no_irrigation	Xynisteri	harvest	1706	6.87684381049618
+ERR4702539	ERR4702539	tillage	no_irrigation	Xynisteri	harvest	1661	6.86170423933624
+ERR4702540	ERR4702540	tillage	no_irrigation	Xynisteri	harvest	1829	6.86237355515006
+ERR4702541	ERR4702541	tillage	no_irrigation	Xynisteri	harvest	2519	7.14979983782159

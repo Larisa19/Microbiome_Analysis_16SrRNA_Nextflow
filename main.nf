@@ -3,6 +3,8 @@ nextflow.enable.dsl=2
 include { DADA2_FILTER; DADA2_LEARN_ERRORS; DADA2_DENOISE; DADA2_MERGE; DADA2_TABLE } from './modules/dada2/main_dada2.nf'
 include { ASV_QC } from './modules/asv_qc/main_asv_qc.nf'
 include { ALPHA_DIVERSITY } from './modules/alpha_diversity/main_alpha_diversity.nf'
+include { RAREFACTION } from './modules/rarefaction/main_rarefaction.nf'
+include { BETA_DIVERSITY } from './modules/beta_diversity/main_beta_diversity.nf'
 
 process FASTQC_RAW {
 tag "$sample_id"
@@ -127,10 +129,14 @@ filtered_for_denoise = DADA2_FILTER.out.filtered
 
 filtered_for_errors = DADA2_FILTER.out.filtered
     .map { sample_id, treatment, irrigation, cultivar, stage, read1, read2, stats ->
-        tuple(read1, read2)
+        tuple(sample_id, read1, read2)
     }
-    .collect()
-
+    .toSortedList { a, b -> a[0] <=> b[0] }
+    .map { sorted_samples ->
+        sorted_samples.collectMany { sample ->
+            [sample[1], sample[2]]
+        }
+    }
 
 DADA2_LEARN_ERRORS(filtered_for_errors)
 
@@ -159,6 +165,13 @@ ASV_QC(
 )
 ALPHA_DIVERSITY(
     DADA2_TABLE.out.asv_table_tsv,
+    Channel.value(file('assets/samplesheet.csv'))
+)
+RAREFACTION(
+    DADA2_TABLE.out.asv_table_tsv
+)
+BETA_DIVERSITY(
+    RAREFACTION.out.rarefied_table,
     Channel.value(file('assets/samplesheet.csv'))
 )
 all_fastqc = FASTQC_RAW.out.fastqc_raw

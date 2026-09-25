@@ -1,0 +1,9 @@
+sample	PCoA1	PCoA2	err	treatment	irrigation	cultivar	stage
+ERR4702530	-0.08459662587316	-0.00909312691261815	ERR4702530	cover_crop	no_irrigation	Xynisteri	harvest
+ERR4702531	-0.0317205907025168	0.0684878940461903	ERR4702531	cover_crop	no_irrigation	Xynisteri	harvest
+ERR4702532	0.0178983169778053	0.323300682363267	ERR4702532	cover_crop	no_irrigation	Xynisteri	harvest
+ERR4702533	-0.337067503904606	-0.130906551881043	ERR4702533	cover_crop	no_irrigation	Xynisteri	harvest
+ERR4702538	0.104490599901346	-0.0295880023164308	ERR4702538	tillage	no_irrigation	Xynisteri	harvest
+ERR4702539	0.203858555224605	-0.224546201953343	ERR4702539	tillage	no_irrigation	Xynisteri	harvest
+ERR4702540	0.0535186242158031	-0.00930447736373408	ERR4702540	tillage	no_irrigation	Xynisteri	harvest
+ERR4702541	0.0736186241607238	0.0116497840177117	ERR4702541	tillage	no_irrigation	Xynisteri	harvest
