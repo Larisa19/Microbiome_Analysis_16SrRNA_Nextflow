@@ -5,6 +5,7 @@ include { ASV_QC } from './modules/asv_qc/main_asv_qc.nf'
 include { ALPHA_DIVERSITY } from './modules/alpha_diversity/main_alpha_diversity.nf'
 include { RAREFACTION } from './modules/rarefaction/main_rarefaction.nf'
 include { BETA_DIVERSITY } from './modules/beta_diversity/main_beta_diversity.nf'
+include { ALPHA_DIVERSITY_PLOT } from './modules/figures/main_figures.nf'
 
 process FASTQC_RAW {
 tag "$sample_id"
@@ -166,6 +167,9 @@ ASV_QC(
 ALPHA_DIVERSITY(
     DADA2_TABLE.out.asv_table_tsv,
     Channel.value(file('assets/samplesheet.csv'))
+)
+ALPHA_DIVERSITY_PLOT(
+    ALPHA_DIVERSITY.out.alpha_diversity
 )
 RAREFACTION(
     DADA2_TABLE.out.asv_table_tsv

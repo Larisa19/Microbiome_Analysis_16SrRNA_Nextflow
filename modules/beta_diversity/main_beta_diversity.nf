@@ -12,6 +12,7 @@ process BETA_DIVERSITY {
     path "bray_curtis_distance.tsv", emit: bray_curtis
     path "pcoa_coordinates.tsv", emit: pcoa_coordinates
     path "permanova_results.tsv", emit: permanova
+    path "permdisp_results.tsv", emit: permdisp
     path "beta_diversity_summary.txt", emit: summary
     path "pcoa_treatment.png", emit: pcoa_plot
 
@@ -140,7 +141,40 @@ process BETA_DIVERSITY {
         data = metadata,
         permutations = 999
     )
+    # PERMDISP: test for differences in within-group dispersion
+dispersion <- vegan::betadisper(
+    bray,
+    metadata\$treatment
+)
 
+permdisp <- vegan::permutest(
+    dispersion,
+    permutations = 999
+)
+
+# Save PERMDISP results
+permdisp_table <- as.data.frame(permdisp\$tab)
+
+permdisp_table\$term <- rownames(permdisp_table)
+
+permdisp_table <- permdisp_table[
+    ,
+    c(
+        "term",
+        setdiff(
+            colnames(permdisp_table),
+            "term"
+        )
+    )
+]
+
+write.table(
+    permdisp_table,
+    file = "permdisp_results.tsv",
+    sep = "\\t",
+    quote = FALSE,
+    row.names = FALSE
+)
     # Save PERMANOVA results
     permanova_table <- as.data.frame(permanova)
 
@@ -238,19 +272,23 @@ process BETA_DIVERSITY {
     )
 
     cat("PERMANOVA:\\n")
-    print(permanova)
+print(permanova)
 
-    sink()
+cat("\\nPERMDISP (test of homogeneity of multivariate dispersion):\\n")
+print(permdisp)
 
-    RSCRIPT
+sink()
+
+RSCRIPT
     """
 
     stub:
-    """
-    touch bray_curtis_distance.tsv
-    touch pcoa_coordinates.tsv
-    touch permanova_results.tsv
-    touch beta_diversity_summary.txt
-    touch pcoa_treatment.png
-    """
+"""
+touch bray_curtis_distance.tsv
+touch pcoa_coordinates.tsv
+touch permanova_results.tsv
+touch permdisp_results.tsv
+touch beta_diversity_summary.txt
+touch pcoa_treatment.png
+"""
 }
