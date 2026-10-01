@@ -53,3 +53,4 @@ results/qc/trimmed/
 results/timeline.html
 results/execution_report.html
 
+assets/reference/*.fa.gz
