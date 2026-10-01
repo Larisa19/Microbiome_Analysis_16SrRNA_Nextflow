@@ -6,6 +6,10 @@ include { ALPHA_DIVERSITY } from './modules/alpha_diversity/main_alpha_diversity
 include { RAREFACTION } from './modules/rarefaction/main_rarefaction.nf'
 include { BETA_DIVERSITY } from './modules/beta_diversity/main_beta_diversity.nf'
 include { ALPHA_DIVERSITY_PLOT } from './modules/figures/main_figures.nf'
+include { TAXONOMY } from './modules/taxonomy/main_taxonomy.nf'
+include { TAXONOMIC_ABUNDANCE } from './modules/taxonomy/main_taxonomic_abundance.nf'
+include { TAXONOMY_PLOT } from './modules/taxonomy/main_taxonomy_plot.nf'
+
 
 process FASTQC_RAW {
 tag "$sample_id"
@@ -162,6 +166,18 @@ DADA2_TABLE(merged_files)
 
 ASV_QC(
     DADA2_TABLE.out.asv_table_tsv,
+    Channel.value(file('assets/samplesheet.csv'))
+)
+TAXONOMY(
+    DADA2_TABLE.out.asv_table_tsv,
+    Channel.value(file('assets/reference/silva_nr99_v138.1_train_set.fa.gz'))
+)
+TAXONOMIC_ABUNDANCE(
+    DADA2_TABLE.out.asv_table_tsv,
+    TAXONOMY.out.taxonomy
+)
+TAXONOMY_PLOT(
+    TAXONOMIC_ABUNDANCE.out.phylum_abundance,
     Channel.value(file('assets/samplesheet.csv'))
 )
 ALPHA_DIVERSITY(
