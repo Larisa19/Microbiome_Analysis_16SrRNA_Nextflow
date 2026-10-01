@@ -4,13 +4,13 @@
 
 ## Overview
 
-This project develops a reproducible **Nextflow workflow** for the analysis of soil microbial communities from a vineyard system using **16S rRNA amplicon sequencing data**.
+This project develops a reproducible **Nextflow DSL2 workflow** for the analysis of soil microbial communities from a vineyard system using **16S rRNA amplicon sequencing data**.
 
 The main biological question is:
 
 > **Does soil management (tillage vs cover crop/no-tillage) affect the microbial community composition of non-irrigated Xynisteri vineyard soil at harvest?**
 
-The workflow is designed to connect reproducible bioinformatics processing with downstream ecological analysis.
+The workflow connects reproducible bioinformatics processing with downstream ecological and taxonomic analysis.
 
 ## Study Design
 
@@ -25,7 +25,7 @@ All selected samples share:
 * Sampling stage: harvest
 * Irrigation: no irrigation
 
-This design was selected to reduce variation from cultivar, sampling stage, and irrigation when comparing soil management treatments.
+This design reduces variation from cultivar, sampling stage, and irrigation when comparing soil management treatments.
 
 ## Dataset
 
@@ -35,7 +35,9 @@ Raw FASTQ files are intentionally **not included** in this repository.
 
 Sample metadata and sequencing accessions are provided in:
 
-`assets/samplesheet.csv`
+```text
+assets/samplesheet.csv
+```
 
 ## Workflow
 
@@ -67,28 +69,31 @@ Sample metadata and sequencing accessions are provided in:
               |                    v             v
               |                 ASV QC     Alpha diversity
               |                                  |
-              +------------------+---------------+
-                                 |
-                                 v
-                               MultiQC
-                                 |
-                                 v
-                    Standardized sequencing depth
-                                 |
-                                 v
-                         Beta diversity
-                                 |
-                                 v
-                     Community composition
-                                 |
-                                 v
-                       Taxonomic assignment
-                                 |
-                                 v
-                       Treatment comparison
-                                 |
-                                 v
-                    Ecological interpretation
+              |                                  v
+              |                         Rarefaction
+              |                                  |
+              +----------------------------------+
+                                             |
+                                             v
+                                      Beta diversity
+                                             |
+                                             v
+                                  Bray-Curtis + PCoA
+                                             |
+                                             v
+                              PERMANOVA + PERMDISP
+                                             |
+                                             v
+                                  Taxonomic assignment
+                                             |
+                                             v
+                                  Phylum composition
+                                             |
+                                             v
+                              Treatment-associated taxa
+                                             |
+                                             v
+                                  Ecological interpretation
 ```
 
 The workflow is implemented using **Nextflow DSL2**, with individual analysis steps organized into reusable modules.
@@ -118,6 +123,14 @@ The workflow currently produces:
 * ASV table validation
 * Observed ASV richness
 * Shannon diversity
+* Rarefied ASV table
+* Bray-Curtis distance matrix
+* PCoA ordination
+* PERMANOVA
+* PERMDISP
+* SILVA-based taxonomic assignment
+* Phylum-level relative abundance
+* Phylum composition visualization
 * MultiQC report
 
 ### ASV validation
@@ -134,55 +147,113 @@ Current validation:
 
 ## Alpha Diversity
 
-Alpha diversity is calculated for each sample using:
+Alpha diversity was calculated for each sample using:
 
 * **Observed ASVs** — a measure of microbial richness
 * **Shannon diversity** — a measure incorporating both richness and relative abundance distribution
 
-Sequencing depth varies between samples, so alpha-diversity comparisons will be performed after **standardizing sequencing depth**.
+Because sequencing depth varies between samples, a standardized sequencing depth was used for downstream diversity analysis through rarefaction.
 
-This step is important for distinguishing biological differences from differences caused by sequencing effort.
+The rarefied ASV table is used for the beta-diversity analysis.
 
-## Planned Ecological Analysis
+## Beta Diversity and Community Structure
 
-The downstream analysis follows the biological question from diversity to community composition:
+Community-level differences were assessed using **Bray-Curtis dissimilarity** based on the rarefied ASV table.
 
-### 1. Standardized alpha diversity
+Ordination was performed using **Principal Coordinates Analysis (PCoA)**.
 
-Compare microbial richness and diversity between:
+The first two PCoA axes explained:
+
+* PCoA1: 18.71%
+* PCoA2: 18.41%
+
+### PERMANOVA
+
+A PERMANOVA test with 999 permutations was used to evaluate whether microbial community composition differed between soil-management treatments.
+
+The current analysis produced:
+
+* R² = 0.170
+* F = 1.233
+* p = 0.03
+
+This indicates that treatment explained approximately **17% of the variation in Bray-Curtis community composition** in this dataset.
+
+### PERMDISP
+
+PERMDISP was used to assess whether differences in within-group dispersion could account for the PERMANOVA result.
+
+Current result:
+
+* F = 0.415
+* p = 0.552
+
+There is no evidence in this dataset of a significant difference in within-group dispersion between treatments.
+
+Because the current comparison contains only four samples per treatment, these results are considered **exploratory** and should be interpreted cautiously.
+
+## Taxonomic Assignment
+
+ASVs were taxonomically assigned using the **SILVA 138.1 reference database** with the DADA2 `assignTaxonomy` method.
+
+The resulting taxonomy table contains assignments at:
+
+* Kingdom
+* Phylum
+* Class
+* Order
+* Family
+* Genus
+
+The SILVA reference database is not stored in the GitHub repository because of its file size. It is downloaded separately and excluded through `.gitignore`.
+
+## Phylum-Level Community Composition
+
+Relative abundance was calculated at the phylum level by aggregating ASV abundances according to their taxonomic assignment.
+
+The current dataset is dominated by several major bacterial and archaeal groups, including:
+
+* Actinobacteriota
+* Proteobacteria
+* Acidobacteriota
+* Chloroflexi
+* Bacteroidota
+* Crenarchaeota
+* Verrucomicrobiota
+* Myxococcota
+* Firmicutes
+
+A treatment-level composition plot summarizes the relative abundance of the most abundant phyla across tillage and cover crop/no-tillage treatments.
+
+## Planned Analysis
+
+The next stage will focus on identifying **treatment-associated taxa** rather than adding additional general preprocessing steps.
+
+Planned analyses include:
+
+### 1. Taxonomic treatment comparison
+
+Compare taxonomic composition between:
 
 * Tillage
 * Cover crop/no-tillage
 
-after controlling for sequencing depth.
+at appropriate taxonomic levels.
 
-### 2. Beta diversity
+### 2. Treatment-associated taxa
 
-Assess differences in overall microbial community structure between soil-management treatments using:
+Identify microbial groups showing differences in relative abundance between soil-management treatments.
 
-* Community distance matrices
-* Ordination
-* Statistical comparison of treatment groups
+### 3. Ecological interpretation
 
-### 3. Community composition
+Interpret the observed community-level and taxonomic patterns in the context of:
 
-Determine whether soil-management treatment is associated with systematic differences in microbial community composition.
+* Soil management
+* Vineyard soil ecology
+* Microbial diversity
+* Potential effects of cover cropping and reduced soil disturbance
 
-### 4. Taxonomic assignment
-
-Assign taxonomy to ASVs and characterize the bacterial groups present in the vineyard soil communities.
-
-### 5. Treatment-associated taxa
-
-Identify taxa or microbial groups associated with differences between tillage and cover crop/no-tillage treatments.
-
-### 6. Ecological interpretation
-
-Connect the observed microbial patterns to the original ecological question:
-
-> **Does soil management affect the structure and diversity of the vineyard soil microbial community?**
-
-The analysis will distinguish sequencing-depth effects from biological differences and interpret the results in the context of soil microbial ecology and vineyard management.
+The final interpretation will distinguish exploratory statistical associations from biological conclusions.
 
 ## Quality Control
 
@@ -203,12 +274,13 @@ The workflow requires:
 * MultiQC
 * R
 * DADA2
+* SILVA 138.1 training reference for taxonomic assignment
 
 ## Reproducibility
 
 The workflow is implemented using **Nextflow DSL2** and organized into modular processes.
 
-Raw sequencing data are not stored in the repository.
+Raw sequencing data and large reference databases are not stored in the repository.
 
 The expected input structure is:
 
@@ -217,17 +289,19 @@ data/raw/
 assets/samplesheet.csv
 ```
 
-Run the complete workflow with:
+The complete workflow can be launched with:
 
 ```bash
 nextflow run main.nf
 ```
 
-To resume a previous run using cached results:
+For a previously cached workflow run:
 
 ```bash
 nextflow run main.nf -resume
 ```
+
+Individual downstream modules can also be executed independently using existing results. This allows analysis and visualization steps to be reproduced without re-running the entire upstream pipeline.
 
 ## Project Structure
 
@@ -236,22 +310,35 @@ microbial_ecology/
 ├── assets/
 │   └── samplesheet.csv
 ├── data/
-│   └── raw/                         # Raw FASTQ files (not tracked)
+│   └── raw/                              # Raw FASTQ files (not tracked)
 ├── modules/
 │   ├── dada2/
 │   │   └── main_dada2.nf
 │   ├── asv_qc/
 │   │   └── main_asv_qc.nf
-│   └── alpha_diversity/
-│       └── main_alpha_diversity.nf
+│   ├── alpha_diversity/
+│   │   └── main_alpha_diversity.nf
+│   ├── rarefaction/
+│   │   └── main_rarefaction.nf
+│   ├── beta_diversity/
+│   │   └── main_beta_diversity.nf
+│   ├── figures/
+│   │   └── main_figures.nf
+│   └── taxonomy/
+│       ├── main_taxonomy.nf
+│       ├── main_taxonomic_abundance.nf
+│       └── main_taxonomy_plot.nf
 ├── docs/
 │   ├── analysis_notes.md
 │   └── table_asv/
 │       └── asv_table.tsv
 ├── results/
-│   ├── asv_qc_summary.tsv
-│   ├── asv_qc_validation.txt
-│   └── alpha_diversity.tsv
+│   ├── asv_qc/
+│   ├── alpha_diversity/
+│   ├── beta_diversity/
+│   ├── rarefaction/
+│   ├── figures/
+│   └── taxonomy/
 ├── main.nf
 ├── nextflow.config
 ├── README.md
@@ -261,10 +348,10 @@ microbial_ecology/
 
 ## Next Steps
 
-The next stage of the workflow will standardize sequencing depth for alpha-diversity analysis.
+The core processing and community-level analysis are now in place.
 
-This will be followed by:
+The next analytical stage is:
 
-**Alpha diversity → Beta diversity → Community composition → Taxonomic assignment → Treatment-associated taxa → Ecological interpretation**
+**Taxonomic comparison → Treatment-associated taxa → Ecological interpretation**
 
-The final goal is to build a reproducible analysis connecting **soil management practices with vineyard soil microbial community structure and diversity**.
+The final goal is to build a reproducible analysis connecting **soil management practices with vineyard soil microbial community structure, diversity, and taxonomic composition**.
