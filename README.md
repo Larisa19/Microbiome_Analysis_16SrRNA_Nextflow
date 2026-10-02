@@ -1,270 +1,336 @@
-# Soil Microbial Ecology: Tillage vs Cover Crop
+# Vineyard Soil Microbial Ecology
 
-> **Work in progress** — This project is currently under development.
+## 16S rRNA amplicon analysis of vineyard soil microbial communities
 
-## Overview
+### Project objective
 
-This project develops a reproducible **Nextflow workflow** for the analysis of soil microbial communities from a vineyard system using **16S rRNA amplicon sequencing data**.
+This project investigates whether **soil management (tillage vs cover crop/no-tillage)** is associated with differences in microbial community composition in vineyard soil.
 
-The main biological question is:
+To isolate the effect of soil management, the analysis focuses on:
 
-> **Does soil management (tillage vs cover crop/no-tillage) affect the microbial community composition of non-irrigated Xynisteri vineyard soil at harvest?**
+* **Cultivar:** Xynisteri
+* **Stage:** harvest
+* **Irrigation:** no irrigation
+* **Treatments:** tillage vs cover crop/no-tillage
+* **Samples:** 8 biological samples (4 per treatment)
 
-The workflow is designed to connect reproducible bioinformatics processing with downstream ecological analysis.
+The sequencing data are from **NCBI BioProject PRJEB40549**.
 
-## Study Design
+The project was implemented as a reproducible **Nextflow DSL2 workflow**, but the main focus is the biological analysis and the reasoning behind the analytical decisions.
 
-The current analysis includes 8 soil samples:
+---
 
-* 4 samples: tillage
-* 4 samples: cover crop/no-tillage
+# Biological question
 
-All selected samples share:
+> **Does soil management affect microbial community composition in non-irrigated Xynisteri vineyard soil at harvest?**
 
-* Cultivar: Xynisteri
-* Sampling stage: harvest
-* Irrigation: no irrigation
+The analysis was deliberately restricted to samples sharing the same cultivar, developmental stage and irrigation condition. This reduces variation from other experimental factors and makes the comparison between the two soil-management treatments more focused.
 
-This design was selected to reduce variation from cultivar, sampling stage, and irrigation when comparing soil management treatments.
+---
 
-## Dataset
+# Samples
 
-Sequencing data are paired-end Illumina MiSeq reads obtained from the public **NCBI/ENA repositories**.
+| Sample     | Treatment  | Irrigation    | Cultivar  | Stage   |
+| ---------- | ---------- | ------------- | --------- | ------- |
+| ERR4702541 | tillage    | no_irrigation | Xynisteri | harvest |
+| ERR4702540 | tillage    | no_irrigation | Xynisteri | harvest |
+| ERR4702539 | tillage    | no_irrigation | Xynisteri | harvest |
+| ERR4702538 | tillage    | no_irrigation | Xynisteri | harvest |
+| ERR4702533 | cover_crop | no_irrigation | Xynisteri | harvest |
+| ERR4702532 | cover_crop | no_irrigation | Xynisteri | harvest |
+| ERR4702531 | cover_crop | no_irrigation | Xynisteri | harvest |
+| ERR4702530 | cover_crop | no_irrigation | Xynisteri | harvest |
 
-Raw FASTQ files are intentionally **not included** in this repository.
-
-Sample metadata and sequencing accessions are provided in:
-
-`assets/samplesheet.csv`
-
-## Workflow
+Metadata:
 
 ```text
-                    Raw paired-end FASTQ
-                            |
-              +-------------+-------------+
-              |                           |
-              v                           v
-           FastQC                       DADA2
-              |                           |
-              v                           v
-          Cutadapt                 Read filtering
-              |                           |
-              v                           v
-     FastQC after trimming          Error modeling
-              |                           |
-              |                           v
-              |                       Denoising
-              |                           |
-              |                           v
-              |                  Paired-end merging
-              |                           |
-              |                           v
-              |                       ASV table
-              |                           |
-              |                    +------+------+
-              |                    |             |
-              |                    v             v
-              |                 ASV QC     Alpha diversity
-              |                                  |
-              +------------------+---------------+
-                                 |
-                                 v
-                               MultiQC
-                                 |
-                                 v
-                    Standardized sequencing depth
-                                 |
-                                 v
-                         Beta diversity
-                                 |
-                                 v
-                     Community composition
-                                 |
-                                 v
-                       Taxonomic assignment
-                                 |
-                                 v
-                       Treatment comparison
-                                 |
-                                 v
-                    Ecological interpretation
-```
-
-The workflow is implemented using **Nextflow DSL2**, with individual analysis steps organized into reusable modules.
-
-## Current Status
-
-The preprocessing and initial ecological analysis have been successfully implemented and tested on the current 8-sample dataset.
-
-### Sequencing and ASV processing
-
-* 8 samples
-* 8,953 inferred ASVs
-* 625,399 total reads
-* Paired-end Illumina MiSeq data
-* DADA2-based ASV inference
-
-The workflow currently produces:
-
-* Raw-read quality control
-* Adapter trimming
-* Post-trimming quality control
-* DADA2 read filtering
-* Error-model estimation
-* Denoising
-* Paired-end merging
-* ASV abundance table
-* ASV table validation
-* Observed ASV richness
-* Shannon diversity
-* MultiQC report
-
-### ASV validation
-
-The ASV table is automatically checked against the sample metadata.
-
-Current validation:
-
-* Samples in metadata: 8
-* Samples in ASV table: 8
-* Matching samples: 8
-* Invalid rows: 0
-* Missing samples: none
-
-## Alpha Diversity
-
-Alpha diversity is calculated for each sample using:
-
-* **Observed ASVs** — a measure of microbial richness
-* **Shannon diversity** — a measure incorporating both richness and relative abundance distribution
-
-Sequencing depth varies between samples, so alpha-diversity comparisons will be performed after **standardizing sequencing depth**.
-
-This step is important for distinguishing biological differences from differences caused by sequencing effort.
-
-## Planned Ecological Analysis
-
-The downstream analysis follows the biological question from diversity to community composition:
-
-### 1. Standardized alpha diversity
-
-Compare microbial richness and diversity between:
-
-* Tillage
-* Cover crop/no-tillage
-
-after controlling for sequencing depth.
-
-### 2. Beta diversity
-
-Assess differences in overall microbial community structure between soil-management treatments using:
-
-* Community distance matrices
-* Ordination
-* Statistical comparison of treatment groups
-
-### 3. Community composition
-
-Determine whether soil-management treatment is associated with systematic differences in microbial community composition.
-
-### 4. Taxonomic assignment
-
-Assign taxonomy to ASVs and characterize the bacterial groups present in the vineyard soil communities.
-
-### 5. Treatment-associated taxa
-
-Identify taxa or microbial groups associated with differences between tillage and cover crop/no-tillage treatments.
-
-### 6. Ecological interpretation
-
-Connect the observed microbial patterns to the original ecological question:
-
-> **Does soil management affect the structure and diversity of the vineyard soil microbial community?**
-
-The analysis will distinguish sequencing-depth effects from biological differences and interpret the results in the context of soil microbial ecology and vineyard management.
-
-## Quality Control
-
-Quality-control results are summarized using **MultiQC**.
-
-The current MultiQC report is available through GitHub Pages:
-
-`https://larisa19.github.io/microbial_ecology/multiqc/`
-
-## Requirements
-
-The workflow requires:
-
-* Nextflow
-* Java
-* FastQC
-* Cutadapt
-* MultiQC
-* R
-* DADA2
-
-## Reproducibility
-
-The workflow is implemented using **Nextflow DSL2** and organized into modular processes.
-
-Raw sequencing data are not stored in the repository.
-
-The expected input structure is:
-
-```text
-data/raw/
 assets/samplesheet.csv
 ```
 
-Run the complete workflow with:
+---
 
-```bash
-nextflow run main.nf
-```
+# Analysis workflow
 
-To resume a previous run using cached results:
-
-```bash
-nextflow run main.nf -resume
-```
-
-## Project Structure
+The complete analysis follows this sequence:
 
 ```text
-microbial_ecology/
-├── assets/
-│   └── samplesheet.csv
-├── data/
-│   └── raw/                         # Raw FASTQ files (not tracked)
-├── modules/
-│   ├── dada2/
-│   │   └── main_dada2.nf
-│   ├── asv_qc/
-│   │   └── main_asv_qc.nf
-│   └── alpha_diversity/
-│       └── main_alpha_diversity.nf
-├── docs/
-│   ├── analysis_notes.md
-│   └── table_asv/
-│       └── asv_table.tsv
-├── results/
-│   ├── asv_qc_summary.tsv
-│   ├── asv_qc_validation.txt
-│   └── alpha_diversity.tsv
-├── main.nf
-├── nextflow.config
-├── README.md
-├── PROJECT_SUMMARY.md
-└── .gitignore
+Raw paired-end FASTQ
+        │
+        ├── FastQC
+        │
+        └── Cutadapt
+              │
+              ▼
+        Trimmed FASTQ
+              │
+              ├── FastQC
+              │
+              └── DADA2 filtering
+                      │
+                      ▼
+                Filtered reads
+                      │
+             ┌────────┴─────────┐
+             │                  │
+             ▼                  ▼
+       Error learning       Denoising
+             │                  │
+             └───────┬──────────┘
+                     ▼
+               Read merging
+                     │
+                     ▼
+                 ASV table
+                     │
+        ┌────────────┼─────────────┐
+        │            │             │
+        ▼            ▼             ▼
+      ASV QC    Alpha diversity  Taxonomy
+        │            │             │
+        │            │        Phylum abundance
+        │            │             │
+        │            │        Composition plot
+        │
+        └────── Rarefaction
+                    │
+                    ▼
+             Rarefied ASV table
+                    │
+                    ▼
+              Bray–Curtis
+                    │
+             ┌──────┼──────┐
+             ▼      ▼      ▼
+            PCoA  PERMANOVA PERMDISP
+
+FastQC raw + FastQC trimmed
+              │
+              ▼
+            MultiQC
 ```
 
-## Next Steps
+---
 
-The next stage of the workflow will standardize sequencing depth for alpha-diversity analysis.
+## Step 1 — Raw read quality control
 
-This will be followed by:
+**Input:** Raw paired-end FASTQ files
 
-**Alpha diversity → Beta diversity → Community composition → Taxonomic assignment → Treatment-associated taxa → Ecological interpretation**
+The raw sequencing reads were assessed before preprocessing to identify potential sequencing-quality issues.
 
-The final goal is to build a reproducible analysis connecting **soil management practices with vineyard soil microbial community structure and diversity**.
+**Tool:** FastQC
+
+**Output:** FastQC reports for each raw FASTQ file.
+
+### Result
+
+FastQC reports were generated for all 8 samples before adapter trimming.
+
+Files: `results/fastqc_raw/`
+
+---
+
+## Step 2 — Adapter trimming
+
+**Input:** Raw paired-end FASTQ files
+
+Adapter sequences were removed before downstream sequence processing.
+
+**Tool:** Cutadapt
+
+Illumina/TruSeq-style adapter sequences were specified for the forward and reverse reads.
+
+**Output:** Trimmed paired-end FASTQ files.
+
+Files: `results/cutadapt/`
+
+---
+
+## Step 3 — Trimmed read quality control
+
+**Input:** Trimmed paired-end FASTQ files
+
+The quality of the reads after adapter removal was assessed before DADA2 processing.
+
+**Tool:** FastQC
+
+**Output:** FastQC reports for the trimmed reads.
+
+### Result
+
+FastQC reports were generated for all 8 samples after adapter trimming.
+
+Files: `results/fastqc_trimmed/`
+
+---
+
+## Step 4 — DADA2 quality filtering
+
+**Input:** Trimmed paired-end FASTQ files
+
+The trimmed reads were filtered to remove low-quality reads and reads containing ambiguous bases.
+
+**Tool:** DADA2 `filterAndTrim()`
+
+Parameters:
+
+* `truncLen = c(220, 180)`
+* `maxN = 0`
+* `maxEE = c(2, 2)`
+* `truncQ = 2`
+* `rm.phix = TRUE`
+* `compress = TRUE`
+
+**Output:** Filtered forward and reverse FASTQ files and filtering statistics.
+
+Files: `results/dada2/filter/`
+
+---
+
+## Step 5 — Learn the DADA2 error model
+
+**Input:**
+
+* Filtered forward reads from all samples
+* Filtered reverse reads from all samples
+
+The DADA2 error model was learned from the filtered reads to characterize sequencing errors.
+
+**Tool:** DADA2 `learnErrors()`
+
+Forward and reverse reads were modeled separately.
+
+**Output:** `error_model_F.rds` and `error_model_R.rds`
+
+Files: `results/dada2/errors/error_model_F.rds`, `results/dada2/errors/error_model_R.rds`
+
+---
+
+## Step 6 — Denoise reads
+
+**Input:**
+
+* Filtered forward and reverse reads
+* Forward and reverse DADA2 error models
+
+The filtered reads were denoised to distinguish biological sequence variation from sequencing errors.
+
+**Tool:** DADA2 `dada()`
+
+Forward and reverse reads were denoised separately using the corresponding error models.
+
+**Output:** DADA2 denoising objects and dereplicated read objects for each sample.
+
+Files: `results/dada2/denoise/`
+
+---
+
+## Step 7 — Paired-end merging
+
+**Input:**
+
+* Denoised forward reads
+* Denoised reverse reads
+* Corresponding dereplicated reads
+
+The forward and reverse DADA2 results were merged to reconstruct the amplicon sequences.
+
+**Tool:** DADA2 `mergePairs()`
+
+**Output:** One merged object per sample.
+
+Files: `results/dada2/merge/`
+
+---
+
+## Step 8 — Construct the ASV table
+
+**Input:** Merged sequences from all samples
+
+The merged sequences were combined into a sequence-by-sample abundance matrix.
+
+**Tool:** DADA2
+
+The workflow:
+
+* reads all merged objects
+* extracts unique ASV sequences
+* creates a matrix with ASVs as rows and samples as columns
+* fills the matrix with the corresponding sequence abundances
+
+**Output:** `results/dada2/table/asv_table.rds`, `results/dada2/table/asv_table.tsv`
+
+### Result
+
+The final table contains:
+
+* **8,953 ASVs**
+* **625,399 total reads**
+
+File: `results/dada2/table/asv_table.tsv`
+
+The ASV table is the main input for the downstream ecological analyses.
+
+---
+
+## Step 9 — ASV quality control
+
+**Input:**
+
+* ASV table
+* sample metadata
+
+The ASV table was validated against the sample metadata before downstream ecological analyses.
+
+**Tool:** Python
+
+The workflow:
+
+* reads the ASV table
+* identifies all sample IDs
+* counts total ASVs and reads per sample
+* counts observed ASVs per sample
+* reads the sample metadata
+* compares sample IDs between the ASV table and metadata
+* checks for invalid rows or missing samples
+
+**Output:** 
+`asv_qc_summary.tsv` — sample-level summary of sequencing reads and observed ASVs; `asv_qc_validation.txt` — validation report confirming that the ASV table and metadata are correctly aligned.
+
+### Result
+
+The validation confirmed:
+
+* **8 samples** in the metadata
+* **8 samples** in the ASV table
+* **8 matching samples**
+* **8,953 ASVs**
+* **0 invalid rows**
+* No samples missing from either the ASV table or metadata
+
+Files: `results/asv_qc/asv_qc_summary.tsv`, `results/asv_qc/asv_qc_validation.txt`
+
+The validated ASV table can now be used for downstream ecological analyses.
+
+---
+## Step 10 — Alpha diversity
+Alpha diversity was calculated to describe microbial diversity within each sample.
+**Input:**
+
+* ASV table
+* sample metadata
+
+**Tool:** R
+
+Two measures were calculated:
+
+* **Observed ASVs** — number of detected ASVs per sample
+* **Shannon diversity** — accounts for both richness and relative abundance
+
+**Output:** `results/alpha_diversity/alpha_diversity.tsv`
+
+### Result
+
+Alpha-diversity values were calculated for all **8 samples**.
+
+The results were used to compare within-sample diversity between the two soil-management treatments.
+
