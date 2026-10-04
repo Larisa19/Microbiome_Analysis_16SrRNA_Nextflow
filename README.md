@@ -110,14 +110,13 @@ FastQC raw + FastQC trimmed
 ```
 
 ---
-
 ## Step 1 — Raw read quality control
 
 **Input:** Raw paired-end FASTQ files from `data/raw/`
 
 **Tools:** FastQC + MultiQC
 
-FastQC was used to assess sequencing quality for each sample, and MultiQC was used to aggregate the results into a single interactive report.
+FastQC was used to assess the quality of the raw sequencing reads. MultiQC was then used to aggregate the FastQC results into an interactive report.
 
 **Output:**
 
@@ -126,9 +125,9 @@ FastQC was used to assess sequencing quality for each sample, and MultiQC was us
 
 ### Result
 
-QC reports were generated for all 8 samples before adapter trimming.
+Quality control was performed for all 8 samples before adapter trimming.
 
-**[View interactive raw-read MultiQC report](https://larisa19.github.io/microbial_ecology/qc/multiqc_raw/multiqc_raw_report.html)**
+**[View interactive raw-read MultiQC report](https://larisa19.github.io/microbial_ecology/qc/raw/multiqc_raw_report.html)**
 
 ---
 
@@ -138,7 +137,7 @@ QC reports were generated for all 8 samples before adapter trimming.
 
 **Tool:** Cutadapt
 
-Illumina/TruSeq-style adapter sequences were removed from the forward and reverse reads.
+Illumina/TruSeq adapter sequences were removed from the forward and reverse reads using Cutadapt.
 
 **Output:** Trimmed paired-end FASTQ files in `results/cutadapt/`
 
@@ -150,7 +149,7 @@ Illumina/TruSeq-style adapter sequences were removed from the forward and revers
 
 **Tools:** FastQC + MultiQC
 
-FastQC was used to assess read quality after adapter removal, and MultiQC was used to aggregate the results into a separate interactive report.
+FastQC was used to assess read quality after adapter removal. MultiQC was then used to aggregate the results into a separate interactive report.
 
 **Output:**
 
@@ -159,10 +158,9 @@ FastQC was used to assess read quality after adapter removal, and MultiQC was us
 
 ### Result
 
-QC reports were generated for all 8 samples after adapter trimming.
+Quality control was performed for all 8 samples after adapter trimming.
 
-**[View interactive trimmed-read MultiQC report](https://larisa19.github.io/microbial_ecology/qc/multiqc_trimmed/multiqc_trimmed_report.html)**
-
+**[View interactive trimmed-read MultiQC report](https://larisa19.github.io/microbial_ecology/qc/trimmed/multiqc_trimmed_report.html)**
 
 ## Step 4 — DADA2 quality filtering
 
