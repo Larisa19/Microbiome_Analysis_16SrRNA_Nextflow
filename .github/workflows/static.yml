@@ -4,12 +4,12 @@ on:
   push:
     branches:
       - master
-workflow_dispatch:
+  workflow_dispatch:
 
 permissions:
-    contents: read
-    pages: write
-    id-token: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: pages
@@ -19,58 +19,58 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-environment:
-  name: github-pages
-  url: ${{ steps.deployment.outputs.page_url }}
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
-steps:
+    steps:
 
-  - name: Checkout
-    uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  - name: Setup Pages
-    uses: actions/configure-pages@v5
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
 
-  - name: Prepare reports
-    run: |
-      mkdir -p _site/qc/raw
-      mkdir -p _site/qc/trimmed
+      - name: Prepare reports
+        run: |
+          mkdir -p _site/qc/raw
+          mkdir -p _site/qc/trimmed
 
-      cp results/qc/multiqc_raw/multiqc_raw_report.html _site/qc/raw/multiqc_raw_report.html
-      cp results/qc/multiqc_trimmed/multiqc_trimmed_report.html _site/qc/trimmed/multiqc_trimmed_report.html
+          cp results/qc/multiqc_raw/multiqc_raw_report.html _site/qc/raw/multiqc_raw_report.html
+          cp results/qc/multiqc_trimmed/multiqc_trimmed_report.html _site/qc/trimmed/multiqc_trimmed_report.html
 
-      cat > _site/index.html <<'EOF'
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Vineyard Soil Microbiome</title>
-      </head>
-      <body>
-        <h1>Vineyard Soil Microbiome</h1>
-        <h2>Quality Control</h2>
-        <ul>
-          <li>
-            <a href="qc/raw/multiqc_raw_report.html">
-              Raw-read MultiQC report
-            </a>
-          </li>
-          <li>
-            <a href="qc/trimmed/multiqc_trimmed_report.html">
-              Trimmed-read MultiQC report
-            </a>
-          </li>
-        </ul>
-      </body>
-      </html>
-      EOF
+          cat > _site/index.html <<'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Vineyard Soil Microbiome</title>
+          </head>
+          <body>
+            <h1>Vineyard Soil Microbiome</h1>
+            <h2>Quality Control</h2>
+            <ul>
+              <li>
+                <a href="qc/raw/multiqc_raw_report.html">
+                  Raw-read MultiQC report
+                </a>
+              </li>
+              <li>
+                <a href="qc/trimmed/multiqc_trimmed_report.html">
+                  Trimmed-read MultiQC report
+                </a>
+              </li>
+            </ul>
+          </body>
+          </html>
+          EOF
 
-  - name: Upload artifact
-    uses: actions/upload-pages-artifact@v3
-    with:
-      path: _site
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
 
-  - name: Deploy to GitHub Pages
-    id: deployment
-    uses: actions/deploy-pages@v5
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
