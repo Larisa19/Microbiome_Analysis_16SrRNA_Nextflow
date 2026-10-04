@@ -1,23 +1,23 @@
 name: Deploy static content to Pages
 
 on:
-push:
-branches:
-- master
+  push:
+    branches:
+      - master
 workflow_dispatch:
 
 permissions:
-contents: read
-pages: write
-id-token: write
+    contents: read
+    pages: write
+    id-token: write
 
 concurrency:
-group: pages
-cancel-in-progress: false
+  group: pages
+  cancel-in-progress: false
 
 jobs:
-deploy:
-runs-on: ubuntu-latest
+  deploy:
+    runs-on: ubuntu-latest
 
 environment:
   name: github-pages
