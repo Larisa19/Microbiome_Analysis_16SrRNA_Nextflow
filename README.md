@@ -113,55 +113,56 @@ FastQC raw + FastQC trimmed
 
 ## Step 1 — Raw read quality control
 
-**Input:** Raw paired-end FASTQ files
+**Input:** Raw paired-end FASTQ files from `data/raw/`
 
-The raw sequencing reads were assessed before preprocessing to identify potential sequencing-quality issues.
+**Tools:** FastQC + MultiQC
 
-**Tool:** FastQC
+FastQC was used to assess sequencing quality for each sample, and MultiQC was used to aggregate the results into a single interactive report.
 
-**Output:** FastQC reports for each raw FASTQ file.
+**Output:**
+
+* FastQC reports: `results/qc/raw/fastqc/`
+* MultiQC report: `results/qc/multiqc_raw/multiqc_raw_report.html`
 
 ### Result
 
-FastQC reports were generated for all 8 samples before adapter trimming.
+QC reports were generated for all 8 samples before adapter trimming.
 
-Files: `results/fastqc_raw/`
+**[View interactive raw-read MultiQC report](https://larisa19.github.io/microbial_ecology/qc/multiqc_raw/multiqc_raw_report.html)**
 
 ---
 
 ## Step 2 — Adapter trimming
 
-**Input:** Raw paired-end FASTQ files
-
-Adapter sequences were removed before downstream sequence processing.
+**Input:** Raw paired-end FASTQ files from `data/raw/`
 
 **Tool:** Cutadapt
 
-Illumina/TruSeq-style adapter sequences were specified for the forward and reverse reads.
+Illumina/TruSeq-style adapter sequences were removed from the forward and reverse reads.
 
-**Output:** Trimmed paired-end FASTQ files.
-
-Files: `results/cutadapt/`
+**Output:** Trimmed paired-end FASTQ files in `results/cutadapt/`
 
 ---
 
 ## Step 3 — Trimmed read quality control
 
-**Input:** Trimmed paired-end FASTQ files
+**Input:** Trimmed paired-end FASTQ files from `results/cutadapt/`
 
-The quality of the reads after adapter removal was assessed before DADA2 processing.
+**Tools:** FastQC + MultiQC
 
-**Tool:** FastQC
+FastQC was used to assess read quality after adapter removal, and MultiQC was used to aggregate the results into a separate interactive report.
 
-**Output:** FastQC reports for the trimmed reads.
+**Output:**
+
+* FastQC reports: `results/qc/trimmed/fastqc/`
+* MultiQC report: `results/qc/multiqc_trimmed/multiqc_trimmed_report.html`
 
 ### Result
 
-FastQC reports were generated for all 8 samples after adapter trimming.
+QC reports were generated for all 8 samples after adapter trimming.
 
-Files: `results/fastqc_trimmed/`
+**[View interactive trimmed-read MultiQC report](https://larisa19.github.io/microbial_ecology/qc/multiqc_trimmed/multiqc_trimmed_report.html)**
 
----
 
 ## Step 4 — DADA2 quality filtering
 
