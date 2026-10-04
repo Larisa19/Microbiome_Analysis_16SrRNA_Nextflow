@@ -34,10 +34,12 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Prepare reports
-  run: |
-    mkdir -p _site/qc
-    cp results/qc/multiqc/multiqc_report.html _site/qc/multiqc_report.html
+    run: |
+      mkdir -p _site/qc/raw
+      mkdir -p _site/qc/trimmed
 
+      cp results/qc/multiqc_raw/multiqc_raw_report.html _site/qc/raw/multiqc_raw_report.html
+      cp results/qc/multiqc_trimmed/multiqc_trimmed_report.html _site/qc/trimmed/multiqc_trimmed_report.html
     cat > _site/index.html <<'EOF'
     <!DOCTYPE html>
     <html lang="en">
@@ -51,8 +53,11 @@ jobs:
       <h2>Quality Control</h2>
       <ul>
         <li>
-          <a href="qc/multiqc_report.html">MultiQC report</a>
-        </li>
+      <a href="qc/raw/multiqc_raw_report.html">Raw-read MultiQC report</a>
+      </li>
+  <li>
+      <a href="qc/trimmed/multiqc_trimmed_report.html">Trimmed-read MultiQC report</a>
+    </li>
       </ul>
     </body>
     </html>
