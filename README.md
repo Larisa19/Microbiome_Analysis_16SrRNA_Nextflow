@@ -1,6 +1,4 @@
-#Vineyard Soil Microbiome Analysis — 16S rRNA & Nextflow
-
-## 16S rRNA amplicon analysis of vineyard soil microbial communities
+##Vineyard Soil Microbiome Analysis — 16S rRNA & Nextflow
 
 ### Project objective
 
