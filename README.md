@@ -312,6 +312,7 @@ The validated ASV table can now be used for downstream ecological analyses.
 
 ---
 ## Step 10 — Alpha diversity
+
 Alpha diversity was calculated to describe microbial diversity within each sample.
 **Input:**
 
@@ -454,3 +455,85 @@ At the community level, treatment effects were detected by PERMANOVA in the beta
 Therefore, soil management was associated with differences in overall microbial community composition, but no individual ASVs could be identified as statistically significant differential features in this dataset.
 
 **Figure:** [![Candidate taxa heatmap](results/candidate_taxa/candidate_taxa_heatmap.png)](results/candidate_taxa/candidate_taxa_heatmap.png)
+
+## Step 15 — Overall conclusions
+
+### Biological question
+
+**Does soil management (tillage vs cover crop/no-tillage) affect the microbial community composition of non-irrigated Xynisteri vineyard soil at harvest?**
+
+### Conclusion
+
+The analysis provides evidence that soil-management treatment was associated with differences in the overall microbial community composition.
+
+Bray-Curtis beta-diversity analysis followed by PCoA showed separation between samples according to soil-management treatment. PERMANOVA indicated that treatment explained approximately **17% of the variation in community composition (R² = 0.17, p = 0.028)**.
+
+PERMDISP was not significant (**p = 0.572**), providing no evidence that differences in within-group dispersion were driving the PERMANOVA result.
+
+At the individual-ASV level, no features remained statistically significant after Benjamini-Hochberg multiple-testing correction. However, **1,115 ASVs showed an exploratory effect size of |log2 fold change| ≥ 2**, and the strongest candidates were linked to their taxonomic assignments for further interpretation.
+
+These results suggest that soil-management treatment was associated with a **community-level shift in microbial composition**, while the available sample size was insufficient to confidently identify individual differential taxa.
+
+Because only four biological replicates were available per treatment, these findings should be considered exploratory and would benefit from validation with a larger number of biological replicates.
+
+### Key findings
+
+| Analysis                              |                   Result |
+| ------------------------------------- | -----------------------: |
+| Samples                               |                        8 |
+| Treatments                            | 4 tillage / 4 cover crop |
+| Total ASVs                            |                    8,965 |
+| PERMANOVA                             |     R² = 0.17, p = 0.028 |
+| PERMDISP                              |                p = 0.572 |
+| Significant ASVs after FDR correction |                        0 |
+| Exploratory ASVs (|log2FC| ≥ 2)       |                    1,115 |
+
+
+Overall, the workflow demonstrates a reproducible 16S rRNA amplicon analysis from raw sequencing reads through quality control, ASV inference, diversity analysis, statistical testing, taxonomic profiling and exploratory feature interpretation.
+
+**Workflow architecture**
+
+Raw FASTQ
+   ↓
+FastQC
+   ↓
+Cutadapt
+   ↓
+FastQC
+   ↓
+DADA2 filtering
+   ↓
+Error learning
+   ↓
+Denoising
+   ↓
+Paired-end merging
+   ↓
+ASV table
+   ├── ASV QC
+   ├── Alpha diversity
+   ├── Rarefaction → Beta diversity → PCoA → PERMANOVA / PERMDISP
+   ├── Taxonomy → Phylum abundance → Composition plot
+   └── Differential abundance → Candidate taxa → Heatmap
+
+The analysis was implemented as a modular Nextflow DSL2 workflow. Independent analytical steps were organized into reusable modules, with explicit input/output channels connecting quality control, ASV inference, diversity analysis, taxonomy and downstream statistical analyses. This structure makes the workflow reproducible, restartable and easier to extend.
+
+## Reproducibility
+
+The workflow was implemented using Nextflow DSL2.
+
+The analysis can be resumed using Nextflow's `-resume` functionality, allowing completed processes to be reused rather than rerun.
+
+Reference data and large sequencing files are not stored in the repository. The SILVA reference database is downloaded separately and referenced by the workflow.
+
+The workflow uses fixed parameters and seeds where stochastic subsampling is required.
+
+## How to run
+
+Clone the repository and enter the project directory:
+
+```bash
+git clone https://github.com/Larisa19/microbial_ecology.git
+cd microbial_ecology
+
+
