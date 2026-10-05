@@ -333,6 +333,8 @@ Alpha-diversity values were calculated for all **8 samples**.
 
 The results were used to compare within-sample diversity between the two soil-management treatments.
 
+**Figure:** [![Alpha diversity](results/figures/alpha_diversity_shannon.png)](results/figures/alpha_diversity_shannon.png)
+
 ## Step 11 — Rarefaction
 
 **Input:** ASV abundance table from `results/dada2/`
@@ -340,8 +342,6 @@ The results were used to compare within-sample diversity between the two soil-ma
 **Tool:** R
 
 The ASV table was rarefied to the minimum sequencing depth across samples to standardize sampling effort before beta-diversity analysis. Reads were subsampled without replacement using a fixed random seed (`123`) for reproducibility.
-
-**Figure:** [![Alpha diversity](results/figures/alpha_diversity_shannon.png)](results/figures/alpha_diversity_shannon.png)
 
 **Output:**
 
