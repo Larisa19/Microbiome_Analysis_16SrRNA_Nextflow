@@ -386,7 +386,7 @@ PERMDISP showed no significant difference in within-group dispersion (**p = 0.55
 
 The comparison included 4 samples per treatment and was therefore considered exploratory.
 
-**Figure:** [![PCoA treatment](results/figures/pcoa_treatment.png)](results/figures/pcoa_treatment.png)
+**Figure:** [![PCoA treatment](results/beta_diversity/pcoa_treatment.png)](results/beta_diversity/pcoa_treatment.png)
 
 
 ## Step 13 — Taxonomic profiling
