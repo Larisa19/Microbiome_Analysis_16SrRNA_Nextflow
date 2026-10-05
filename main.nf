@@ -10,6 +10,7 @@ include { TAXONOMY } from './modules/taxonomy/main_taxonomy.nf'
 include { TAXONOMIC_ABUNDANCE } from './modules/taxonomy/main_taxonomic_abundance.nf'
 include { TAXONOMY_PLOT } from './modules/taxonomy/main_taxonomy_plot.nf'
 include { DIFFERENTIAL_ABUNDANCE } from './modules/differential_abundance/main_differential_abundance.nf'
+include { CANDIDATE_TAXA } from './modules/candidate_taxa/main_candidate_taxa.nf'
 
 
 process FASTQC_RAW {
@@ -123,6 +124,13 @@ workflow {
 
     FASTQC_TRIMMED(
         CUTADAPT.out.trimmed_reads
+    )
+    all_fastqc = FASTQC_RAW.out.fastqc_raw
+        .mix(FASTQC_TRIMMED.out.fastqc_trimmed)
+        .collect()
+
+    MULTIQC(
+        all_fastqc
     )
 
     DADA2_FILTER(
@@ -246,15 +254,12 @@ workflow {
         Channel.value(file('assets/samplesheet.csv')),
         TAXONOMY.out.taxonomy
     )
-
-
-    all_fastqc = FASTQC_RAW.out.fastqc_raw
-        .mix(FASTQC_TRIMMED.out.fastqc_trimmed)
-        .collect()
-
-
-    MULTIQC(
-        all_fastqc
+        CANDIDATE_TAXA(
+        DADA2_TABLE.out.asv_table_tsv,
+        DIFFERENTIAL_ABUNDANCE.out.candidates,
+        TAXONOMY.out.taxonomy,
+        Channel.value(file('assets/samplesheet.csv')),
+        BETA_DIVERSITY.out.summary
     )
 
 }

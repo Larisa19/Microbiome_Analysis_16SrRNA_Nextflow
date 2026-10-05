@@ -1,0 +1,53 @@
+Exploratory candidate taxa analysis
+===================================
+
+Exploratory candidates meeting |log2 fold change| >= 2: 1115
+Candidate taxa visualized: 10
+
+Candidates were ranked by absolute log2 fold change.
+The ten strongest exploratory candidates were retained for visualization.
+
+Candidate ASVs were linked to SILVA taxonomic assignments.
+Relative abundance was calculated for each candidate ASV across samples.
+
+Interpretation:
+These features are exploratory signals and should not be interpreted
+as statistically confirmed differential taxa.
+
+Community-level beta-diversity results:
+BETA DIVERSITY ANALYSIS
+=======================
+
+Distance metric: Bray-Curtis
+Ordination: PCoA
+Statistical test: PERMANOVA
+Permutations: 999
+
+PCoA variance explained:
+PCoA1: 18.67%
+PCoA2: 18.24%
+
+PERMANOVA:
+Permutation test for adonis under reduced model
+Terms added sequentially (first to last)
+Permutation: free
+Number of permutations: 999
+
+vegan::adonis2(formula = bray ~ treatment, data = metadata, permutations = 999)
+          Df SumOfSqs      R2      F Pr(>F)  
+treatment  1  0.16537 0.16963 1.2257  0.028 *
+Residual   6  0.80951 0.83037                
+Total      7  0.97488 1.00000                
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+PERMDISP (test of homogeneity of multivariate dispersion):
+
+Permutation test for homogeneity of multivariate dispersions
+Permutation: free
+Number of permutations: 999
+
+Response: Distances
+          Df   Sum Sq   Mean Sq      F N.Perm Pr(>F)
+Groups     1 0.001236 0.0012360 0.4126    999  0.572
+Residuals  6 0.017972 0.0029954                     

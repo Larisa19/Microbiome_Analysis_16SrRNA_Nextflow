@@ -341,6 +341,8 @@ The results were used to compare within-sample diversity between the two soil-ma
 
 The ASV table was rarefied to the minimum sequencing depth across samples to standardize sampling effort before beta-diversity analysis. Reads were subsampled without replacement using a fixed random seed (`123`) for reproducibility.
 
+**Figure:** [![Alpha diversity](results/figures/alpha_diversity_shannon.png)](results/figures/alpha_diversity_shannon.png)
+
 **Output:**
 
 * Rarefied ASV table: `results/rarefaction/asv_table_rarefied.tsv`
@@ -384,6 +386,9 @@ PERMDISP showed no significant difference in within-group dispersion (**p = 0.55
 
 The comparison included 4 samples per treatment and was therefore considered exploratory.
 
+**Figure:** [![PCoA treatment](results/figures/pcoa_treatment.png)](results/figures/pcoa_treatment.png)
+
+
 ## Step 13 — Taxonomic profiling
 
 **Input:**
@@ -407,6 +412,9 @@ The 10 most abundant phyla across samples were visualized, with remaining phyla 
 ### Result
 
 Taxonomic profiles were generated for the 8 samples and summarized at the phylum level to compare microbial community composition between `tillage` and `cover_crop` treatments.
+
+**Figure:** [![Phylum composition](results/figures/phylum_composition.png)](results/figures/phylum_composition.png)
+
 
 ## Step 14 — Differential abundance analysis
 
@@ -444,3 +452,5 @@ This indicates that, although some ASVs showed large differences in relative abu
 At the community level, treatment effects were detected by PERMANOVA in the beta-diversity analysis (R² = 0.17, p = 0.03), while PERMDISP showed no evidence of differences in within-group dispersion (p = 0.552).
 
 Therefore, soil management was associated with differences in overall microbial community composition, but no individual ASVs could be identified as statistically significant differential features in this dataset.
+
+**Figure:** [![Candidate taxa heatmap](results/candidate_taxa/candidate_taxa_heatmap.png)](results/candidate_taxa/candidate_taxa_heatmap.png)
