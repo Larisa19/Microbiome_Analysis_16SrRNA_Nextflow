@@ -9,197 +9,252 @@ include { ALPHA_DIVERSITY_PLOT } from './modules/figures/main_figures.nf'
 include { TAXONOMY } from './modules/taxonomy/main_taxonomy.nf'
 include { TAXONOMIC_ABUNDANCE } from './modules/taxonomy/main_taxonomic_abundance.nf'
 include { TAXONOMY_PLOT } from './modules/taxonomy/main_taxonomy_plot.nf'
+include { DIFFERENTIAL_ABUNDANCE } from './modules/differential_abundance/main_differential_abundance.nf'
 
 
 process FASTQC_RAW {
-tag "$sample_id"
 
-input:
+    tag "$sample_id"
 
-tuple val(sample_id), val(treatment), val(irrigation), val(cultivar), val(stage), path(reads)
+    input:
+    tuple val(sample_id), val(treatment), val(irrigation), val(cultivar), val(stage), path(reads)
 
-output:
+    output:
+    path "*_fastqc.*", emit: fastqc_raw
 
-path "*_fastqc.*", emit: fastqc_raw
-
-script:
-
-"""
-fastqc ${reads}
-"""
+    script:
+    """
+    fastqc ${reads}
+    """
 }
+
 
 process CUTADAPT {
 
-tag "$sample_id"
+    tag "$sample_id"
 
-input:
+    input:
+    tuple val(sample_id), val(treatment), val(irrigation), val(cultivar), val(stage), path(reads)
 
-tuple val(sample_id), val(treatment), val(irrigation), val(cultivar), val(stage), path(reads)
+    output:
+    tuple val(sample_id),
+          val(treatment),
+          val(irrigation),
+          val(cultivar),
+          val(stage),
+          path("${sample_id}_trimmed_1.fastq"),
+          path("${sample_id}_trimmed_2.fastq"),
+          emit: trimmed_reads
 
-output:
-
-tuple val(sample_id),
-      val(treatment),
-      val(irrigation),
-      val(cultivar),
-      val(stage),
-      path("${sample_id}_trimmed_1.fastq"),
-      path("${sample_id}_trimmed_2.fastq"),
-      emit: trimmed_reads
-
-script:
-
-"""
-cutadapt \
-    -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA \
-    -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT \
-    -o ${sample_id}_trimmed_1.fastq \
-    -p ${sample_id}_trimmed_2.fastq \
-    ${reads[0]} ${reads[1]}
-"""
+    script:
+    """
+    cutadapt \
+        -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA \
+        -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT \
+        -o ${sample_id}_trimmed_1.fastq \
+        -p ${sample_id}_trimmed_2.fastq \
+        ${reads[0]} ${reads[1]}
+    """
 }
+
 
 process FASTQC_TRIMMED {
-tag "$sample_id"
 
-input:
+    tag "$sample_id"
 
-tuple val(sample_id),
-      val(treatment),
-      val(irrigation),
-      val(cultivar),
-      val(stage),
-      path(read1),
-      path(read2)
+    input:
+    tuple val(sample_id),
+          val(treatment),
+          val(irrigation),
+          val(cultivar),
+          val(stage),
+          path(read1),
+          path(read2)
 
-output:
+    output:
+    path "*_fastqc.*", emit: fastqc_trimmed
 
-path "*_fastqc.*", emit: fastqc_trimmed
-
-script:
-
-"""
-fastqc ${read1} ${read2}
-"""
+    script:
+    """
+    fastqc ${read1} ${read2}
+    """
 }
+
 
 process MULTIQC {
-input:
 
-path fastqc_results
+    input:
+    path fastqc_results
 
-output:
+    output:
+    path "multiqc_report.html"
 
-path "multiqc_report.html"
-
-script:
-
-"""
-multiqc . -o . -n multiqc_report.html
-"""
+    script:
+    """
+    multiqc . -o . -n multiqc_report.html
+    """
 }
 
+
 workflow {
-samples = Channel
-    .fromPath('assets/samplesheet.csv')
-    .splitCsv(header: true)
-    .map { row ->
 
-        def r1 = file("data/raw/${row.err}_1.fastq")
-        def r2 = file("data/raw/${row.err}_2.fastq")
+    samples = Channel
+        .fromPath('assets/samplesheet.csv')
+        .splitCsv(header: true)
+        .map { row ->
 
-        tuple(
-            row.sample,
-            row.treatment,
-            row.irrigation,
-            row.cultivar,
-            row.stage,
-            [r1, r2]
-        )
-    }
+            def r1 = file("data/raw/${row.err}_1.fastq")
+            def r2 = file("data/raw/${row.err}_2.fastq")
 
-FASTQC_RAW(samples)
+            tuple(
+                row.sample,
+                row.treatment,
+                row.irrigation,
+                row.cultivar,
+                row.stage,
+                [r1, r2]
+            )
+        }
 
-CUTADAPT(samples)
 
-FASTQC_TRIMMED(CUTADAPT.out.trimmed_reads)
+    FASTQC_RAW(samples)
 
-DADA2_FILTER(CUTADAPT.out.trimmed_reads)
+    CUTADAPT(samples)
 
-filtered_for_denoise = DADA2_FILTER.out.filtered
-    .map { sample_id, treatment, irrigation, cultivar, stage, read1, read2, stats ->
-        tuple(sample_id, treatment, irrigation, cultivar, stage, read1, read2)
-    }
+    FASTQC_TRIMMED(
+        CUTADAPT.out.trimmed_reads
+    )
 
-filtered_for_errors = DADA2_FILTER.out.filtered
-    .map { sample_id, treatment, irrigation, cultivar, stage, read1, read2, stats ->
-        tuple(sample_id, read1, read2)
+    DADA2_FILTER(
+        CUTADAPT.out.trimmed_reads
+    )
+
+
+    filtered_for_denoise = DADA2_FILTER.out.filtered
+        .map { sample_id, treatment, irrigation, cultivar, stage, read1, read2, stats ->
+            tuple(
+                sample_id,
+                treatment,
+                irrigation,
+                cultivar,
+                stage,
+                read1,
+                read2
+            )
+        }
+
+
+    filtered_for_errors = DADA2_FILTER.out.filtered
+        .map { sample_id, treatment, irrigation, cultivar, stage, read1, read2, stats ->
+            tuple(
+                sample_id,
+                read1,
+                read2
+            )
+        }
+        .toSortedList { a, b -> a[0] <=> b[0] }
+        .map { sorted_samples ->
+            sorted_samples.collectMany { sample ->
+                [sample[1], sample[2]]
+            }
+        }
+
+
+    DADA2_LEARN_ERRORS(
+        filtered_for_errors
+    )
+
+    error_model_F = DADA2_LEARN_ERRORS.out.error_model_F.first()
+    error_model_R = DADA2_LEARN_ERRORS.out.error_model_R.first()
+
+
+    DADA2_DENOISE(
+        filtered_for_denoise,
+        error_model_F,
+        error_model_R
+    )
+
+
+    DADA2_MERGE(
+        DADA2_DENOISE.out.denoised
+    )
+
+
+   merged_files = DADA2_MERGE.out.merged
+    .map { sample_id, treatment, irrigation, cultivar, stage, merged ->
+        tuple(sample_id, merged)
     }
     .toSortedList { a, b -> a[0] <=> b[0] }
     .map { sorted_samples ->
-        sorted_samples.collectMany { sample ->
-            [sample[1], sample[2]]
-        }
+        sorted_samples.collect { sample -> sample[1] }
     }
 
-DADA2_LEARN_ERRORS(filtered_for_errors)
 
-error_model_F = DADA2_LEARN_ERRORS.out.error_model_F.first()
-error_model_R = DADA2_LEARN_ERRORS.out.error_model_R.first()
+    DADA2_TABLE(
+        merged_files
+    )
 
-DADA2_DENOISE(
-    filtered_for_denoise,
-    error_model_F,
-    error_model_R
-)
 
-DADA2_MERGE(DADA2_DENOISE.out.denoised)
+    ASV_QC(
+        DADA2_TABLE.out.asv_table_tsv,
+        Channel.value(file('assets/samplesheet.csv'))
+    )
 
-merged_files = DADA2_MERGE.out.merged
-    .map { sample_id, treatment, irrigation, cultivar, stage, merged ->
-        merged
-    }
-    .collect()
 
-DADA2_TABLE(merged_files)
+    TAXONOMY(
+        DADA2_TABLE.out.asv_table_tsv,
+        Channel.value(file('assets/reference/silva_nr99_v138.1_train_set.fa.gz'))
+    )
 
-ASV_QC(
-    DADA2_TABLE.out.asv_table_tsv,
-    Channel.value(file('assets/samplesheet.csv'))
-)
-TAXONOMY(
-    DADA2_TABLE.out.asv_table_tsv,
-    Channel.value(file('assets/reference/silva_nr99_v138.1_train_set.fa.gz'))
-)
-TAXONOMIC_ABUNDANCE(
-    DADA2_TABLE.out.asv_table_tsv,
-    TAXONOMY.out.taxonomy
-)
-TAXONOMY_PLOT(
-    TAXONOMIC_ABUNDANCE.out.phylum_abundance,
-    Channel.value(file('assets/samplesheet.csv'))
-)
-ALPHA_DIVERSITY(
-    DADA2_TABLE.out.asv_table_tsv,
-    Channel.value(file('assets/samplesheet.csv'))
-)
-ALPHA_DIVERSITY_PLOT(
-    ALPHA_DIVERSITY.out.alpha_diversity
-)
-RAREFACTION(
-    DADA2_TABLE.out.asv_table_tsv
-)
-BETA_DIVERSITY(
-    RAREFACTION.out.rarefied_table,
-    Channel.value(file('assets/samplesheet.csv'))
-)
-all_fastqc = FASTQC_RAW.out.fastqc_raw
-    .mix(FASTQC_TRIMMED.out.fastqc_trimmed)
-    .collect()
 
-MULTIQC(all_fastqc)
+    TAXONOMIC_ABUNDANCE(
+        DADA2_TABLE.out.asv_table_tsv,
+        TAXONOMY.out.taxonomy
+    )
+
+
+    TAXONOMY_PLOT(
+        TAXONOMIC_ABUNDANCE.out.phylum_abundance,
+        Channel.value(file('assets/samplesheet.csv'))
+    )
+
+
+    ALPHA_DIVERSITY(
+        DADA2_TABLE.out.asv_table_tsv,
+        Channel.value(file('assets/samplesheet.csv'))
+    )
+
+
+    ALPHA_DIVERSITY_PLOT(
+        ALPHA_DIVERSITY.out.alpha_diversity
+    )
+
+
+    RAREFACTION(
+        DADA2_TABLE.out.asv_table_tsv
+    )
+
+
+    BETA_DIVERSITY(
+        RAREFACTION.out.rarefied_table,
+        Channel.value(file('assets/samplesheet.csv'))
+    )
+
+
+    DIFFERENTIAL_ABUNDANCE(
+        DADA2_TABLE.out.asv_table_tsv,
+        Channel.value(file('assets/samplesheet.csv')),
+        TAXONOMY.out.taxonomy
+    )
+
+
+    all_fastqc = FASTQC_RAW.out.fastqc_raw
+        .mix(FASTQC_TRIMMED.out.fastqc_trimmed)
+        .collect()
+
+
+    MULTIQC(
+        all_fastqc
+    )
 
 }
-
-

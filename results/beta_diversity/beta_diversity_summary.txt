@@ -7,8 +7,8 @@ Statistical test: PERMANOVA
 Permutations: 999
 
 PCoA variance explained:
-PCoA1: 18.71%
-PCoA2: 18.41%
+PCoA1: 18.67%
+PCoA2: 18.24%
 
 PERMANOVA:
 Permutation test for adonis under reduced model
@@ -18,9 +18,9 @@ Number of permutations: 999
 
 vegan::adonis2(formula = bray ~ treatment, data = metadata, permutations = 999)
           Df SumOfSqs      R2      F Pr(>F)  
-treatment  1  0.16555 0.17046 1.2329   0.03 *
-Residual   6  0.80564 0.82954                
-Total      7  0.97119 1.00000                
+treatment  1  0.16537 0.16963 1.2257  0.028 *
+Residual   6  0.80951 0.83037                
+Total      7  0.97488 1.00000                
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
@@ -31,6 +31,6 @@ Permutation: free
 Number of permutations: 999
 
 Response: Distances
-          Df    Sum Sq   Mean Sq      F N.Perm Pr(>F)
-Groups     1 0.0012858 0.0012858 0.4154    999  0.552
-Residuals  6 0.0185709 0.0030952                     
+          Df   Sum Sq   Mean Sq      F N.Perm Pr(>F)
+Groups     1 0.001236 0.0012360 0.4126    999  0.572
+Residuals  6 0.017972 0.0029954                     

@@ -1,0 +1,24 @@
+Differential abundance analysis
+================================
+
+Samples analysed: 8
+Tillage samples: 4
+Cover-crop samples: 4
+
+Total ASVs: 8901
+ASVs retained after prevalence filtering: 2782
+
+Statistical test: Wilcoxon rank-sum test
+Multiple-testing correction: Benjamini-Hochberg FDR
+Significance threshold: FDR < 0.05
+Significant effect-size threshold: |log2 fold change| >= 1
+Exploratory candidate threshold: |log2 fold change| >= 2
+Exploratory prevalence threshold: >= 2 samples in at least one treatment
+
+Statistically significant ASVs: 0
+Higher in cover_crop: 0
+Higher in tillage: 0
+Exploratory candidate ASVs: 1115
+
+Interpretation:
+Results are exploratory because only four samples were available per treatment.

@@ -333,3 +333,114 @@ Alpha-diversity values were calculated for all **8 samples**.
 
 The results were used to compare within-sample diversity between the two soil-management treatments.
 
+## Step 11 — Rarefaction
+
+**Input:** ASV abundance table from `results/dada2/`
+
+**Tool:** R
+
+The ASV table was rarefied to the minimum sequencing depth across samples to standardize sampling effort before beta-diversity analysis. Reads were subsampled without replacement using a fixed random seed (`123`) for reproducibility.
+
+**Output:**
+
+* Rarefied ASV table: `results/rarefaction/asv_table_rarefied.tsv`
+* Rarefaction information: `results/rarefaction/rarefaction_info.txt`
+
+### Result
+
+The rarefied ASV table was used as input for the beta-diversity analysis.
+
+---
+
+## Step 12 — Beta diversity
+
+**Input:**
+
+* Rarefied ASV table: `results/rarefaction/asv_table_rarefied.tsv`
+* Sample metadata: `samplesheet.csv`
+
+**Tools:** R + vegan + ggplot2
+
+Bray-Curtis dissimilarity was calculated to compare microbial community composition between samples. Principal Coordinates Analysis (PCoA) was used to visualize community-level differences.
+
+PERMANOVA with 999 permutations was used to test whether community composition differed between soil-management treatments (`tillage` vs `cover_crop`). PERMDISP was used to assess differences in within-group dispersion.
+
+**Output:**
+
+* Bray-Curtis distance matrix: `results/beta_diversity/bray_curtis_distance.tsv`
+* PCoA coordinates: `results/beta_diversity/pcoa_coordinates.tsv`
+* PERMANOVA results: `results/beta_diversity/permanova_results.tsv`
+* PERMDISP results: `results/beta_diversity/permdisp_results.tsv`
+* PCoA plot: `results/beta_diversity/pcoa_treatment.png`
+* Analysis summary: `results/beta_diversity/beta_diversity_summary.txt`
+
+### Result
+
+The first two PCoA axes explained **18.71%** and **18.41%** of the variation, respectively.
+
+PERMANOVA indicated a treatment-associated difference in microbial community composition (**R² = 0.17, p = 0.03**).
+
+PERMDISP showed no significant difference in within-group dispersion (**p = 0.552**).
+
+The comparison included 4 samples per treatment and was therefore considered exploratory.
+
+## Step 13 — Taxonomic profiling
+
+**Input:**
+
+* ASV abundance table
+* SILVA v138.1 reference database
+* Sample metadata
+
+**Tools:** DADA2 + R + ggplot2
+
+Taxonomy was assigned to ASV sequences using the SILVA v138.1 reference database. ASV abundances were then aggregated at the phylum level and summarized by soil-management treatment.
+
+The 10 most abundant phyla across samples were visualized, with remaining phyla grouped as "Other".
+
+**Output:**
+
+* Taxonomic assignments: `results/taxonomy/taxonomy.tsv`
+* Phylum-level relative abundance: `results/taxonomy/phylum_abundance.tsv`
+* Phylum composition plot: `results/figures/phylum_composition.png`
+
+### Result
+
+Taxonomic profiles were generated for the 8 samples and summarized at the phylum level to compare microbial community composition between `tillage` and `cover_crop` treatments.
+
+## Step 14 — Differential abundance analysis
+
+**Input:**
+
+* ASV abundance table
+* Sample metadata
+* Soil-management treatment groups
+
+**Tools:** R
+
+Differential abundance analysis was performed at the ASV level to identify microbial features showing differences in relative abundance between `tillage` and `cover_crop` treatments.
+
+ASVs were first filtered based on prevalence, retaining features detected in at least two samples in either treatment group. Abundance counts were then converted to relative abundance to account for differences in sequencing depth between samples.
+
+For each ASV, mean and median relative abundance were calculated for each treatment. A Wilcoxon rank-sum test was used to compare the two treatment groups, and log2 fold change was calculated as the ratio of mean relative abundance in `cover_crop` relative to `tillage`.
+
+Because only four biological replicates were available per treatment, the analysis was considered exploratory. Multiple testing correction was performed using the Benjamini-Hochberg false discovery rate (FDR) procedure.
+
+ASVs were considered statistically significant when **FDR < 0.05** and **|log2 fold change| ≥ 1**.
+
+**Output:**
+
+* Differential abundance results: `results/differential_abundance/differential_abundance.tsv`
+* Differential abundance summary: `results/differential_abundance/differential_abundance_summary.txt`
+
+### Result
+
+A total of 8 samples and 8,965 ASVs were analysed. After prevalence filtering, 2,799 ASVs were retained for differential abundance testing.
+
+No individual ASVs met both the FDR and effect-size thresholds.
+
+This indicates that, although some ASVs showed large differences in relative abundance between treatments, these individual differences were not statistically supported after multiple-testing correction.
+
+At the community level, treatment effects were detected by PERMANOVA in the beta-diversity analysis (R² = 0.17, p = 0.03), while PERMDISP showed no evidence of differences in within-group dispersion (p = 0.552).
+
+Therefore, soil management was associated with differences in overall microbial community composition, but no individual ASVs could be identified as statistically significant differential features in this dataset.
